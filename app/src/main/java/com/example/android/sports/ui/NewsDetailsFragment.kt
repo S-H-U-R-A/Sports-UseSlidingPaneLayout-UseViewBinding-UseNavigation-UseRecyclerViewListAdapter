@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.sports
+package com.example.android.sports.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -22,14 +22,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
-import com.example.android.sports.databinding.FragmentSportsListBinding
+import coil.load
+import com.example.android.sports.databinding.FragmentSportsNewsBinding
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ * A simple [Fragment] subclass as the second destination in the navigation.
  */
-
-class SportsListFragment : Fragment() {
+class NewsDetailsFragment : Fragment() {
 
     private val sportsViewModel: SportsViewModel by activityViewModels()
 
@@ -37,23 +36,19 @@ class SportsListFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return FragmentSportsListBinding.inflate(inflater, container, false).root
+        return FragmentSportsNewsBinding.inflate(inflater, container, false).root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val binding = FragmentSportsListBinding.bind(view)
+        val binding = FragmentSportsNewsBinding.bind(view)
 
-        // Initialize the adapter and set it to the RecyclerView.
-        val adapter = SportsAdapter {
-            // Update the user selected sport as the current sport in the shared viewmodel
-            // This will automatically update the dual pane content
-            sportsViewModel.updateCurrentSport(it)
-            // Navigate to the details screen
-            val action = SportsListFragmentDirections.actionSportsListFragmentToNewsFragment()
-            this.findNavController().navigate(action)
+        // Attach an observer on the currentSport to update the UI automatically when the data
+        // changes.
+        sportsViewModel.currentSport.observe(this.viewLifecycleOwner) {
+            binding.titleDetail.text = getString(it.titleResourceId)
+            binding.sportsImageDetail.load(it.sportsImageBanner)
+            binding.newsDetail.text = getString(it.newsDetails)
         }
-        binding.recyclerView.adapter = adapter
-        adapter.submitList(sportsViewModel.sportsData)
     }
 }

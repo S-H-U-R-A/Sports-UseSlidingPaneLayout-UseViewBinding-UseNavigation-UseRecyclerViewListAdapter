@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.sports
+package com.example.android.sports.ui
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -26,19 +26,24 @@ import coil.load
 import com.example.android.sports.databinding.SportsListItemBinding
 import com.example.android.sports.model.Sport
 
-class SportsAdapter(private val onItemClicked: (Sport) -> Unit) :
-    ListAdapter<Sport, SportsAdapter.SportsViewHolder>(DiffCallback) {
+class SportsAdapter(
+    private val onItemClicked: (Sport) -> Unit
+) : ListAdapter<Sport, SportsAdapter.SportsViewHolder>(DiffCallback) {
 
     private lateinit var context: Context
 
-    class SportsViewHolder(private var binding: SportsListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class SportsViewHolder(
+        private var binding: SportsListItemBinding
+    ) : RecyclerView.ViewHolder(binding.root)
+    {
 
         fun bind(sport: Sport, context:Context) {
+
             binding.title.text = context.getString(sport.titleResourceId)
             binding.subTitle.text = context.getString(sport.subTitleResourceId)
             // Load the images into the ImageView using the Coil library.
             binding.sportsImage.load(sport.imageResourceId)
+
         }
     }
 
@@ -46,28 +51,37 @@ class SportsAdapter(private val onItemClicked: (Sport) -> Unit) :
         parent: ViewGroup,
         viewType: Int
     ): SportsViewHolder {
+
         context = parent.context
-        return SportsViewHolder(
-            SportsListItemBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
+
+        val binding = SportsListItemBinding.inflate(
+            LayoutInflater.from(context), parent, false
         )
+
+        return SportsViewHolder(binding)
+
     }
 
     override fun onBindViewHolder(holder: SportsViewHolder, position: Int) {
+
         val current = getItem(position)
+
         holder.itemView.setOnClickListener {
             onItemClicked(current)
         }
+
         holder.bind(current, context)
     }
 
     companion object {
+
         private val DiffCallback = object : DiffUtil.ItemCallback<Sport>() {
+
             override fun areItemsTheSame(oldItem: Sport, newItem: Sport): Boolean {
-                return (oldItem.id == newItem.id ||
-                        oldItem.titleResourceId == newItem.titleResourceId ||
-                        oldItem.subTitleResourceId == newItem.subTitleResourceId
+                return (
+                            oldItem.id == newItem.id ||
+                            oldItem.titleResourceId == newItem.titleResourceId ||
+                            oldItem.subTitleResourceId == newItem.subTitleResourceId
                         )
             }
 
@@ -75,5 +89,6 @@ class SportsAdapter(private val onItemClicked: (Sport) -> Unit) :
                 return oldItem == newItem
             }
         }
+
     }
 }
